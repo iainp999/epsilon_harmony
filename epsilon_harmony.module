@@ -40,6 +40,14 @@ function epsilon_harmony_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  //Entity display page.
+  $items['admin/config/services/epsilon_harmony/log/%epsilon_harmony_logs/details'] = array(
+    'title' => 'Epsilon Harmony Log Details',
+    'page callback' => 'epsilon_harmony_logs_details',
+    'page arguments' => array(5),
+    'access arguments' => array('access epsilon harmony logs'),
+  );    
+
   return $items;
 }
 
