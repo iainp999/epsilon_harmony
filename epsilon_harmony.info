@@ -6,3 +6,9 @@ configure = admin/config/services/epsilon_harmony
 
 dependencies[] = entity
 dependencies[] = views
+
+; Entity controller
+files[] = includes/Entity/EntityEpsilonHarmonyLogs.controller.inc
+
+; Entity views controller
+files[] = includes/Views/EntityHarmonyApiViews.controller.inc

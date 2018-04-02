@@ -56,3 +56,134 @@ function epsilon_harmony_permission() {
     ),
   );
 }
+
+/**
+ * Implements hook_entity_info().
+ */
+function epsilon_harmony_entity_info() {
+  $info = array();
+  $info['epsilon_harmony_logs'] = array(
+    'label' => t('Epsilon Harmony Logs'),
+    'controller class' => 'EntityEpsilonHarmonyLogsController',
+    'fieldable' => TRUE,
+    'entity class' => 'EpsilonHarmonyLog',
+    'base table' => 'epsilon_harmony_logs',
+    'uri callback' => 'epsilon_harmony_logs_uri',
+    'entity keys' => array(
+      'id' => 'log_id',
+    ),
+    'views controller class' => 'EntityEpsilonHarmonyLogsViewsController',
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function epsilon_harmony_theme() {
+  $items = array();
+  $path = drupal_get_path('module', 'epsilon_harmony') . '/templates';
+  $items['epsilon_harmony_log'] = array(
+    'template' => 'epsilon_harmony_log',
+    'path' => $path,
+  );
+  return $items;
+}
+
+/**
+ * Implements the uri callback for Epsilon Harmony Logs.
+ */
+function epsilon_harmony_logs_uri($log) {
+  return array(
+    'path' => 'admin/config/services/epsilon_harmony/log/' . $log->log_id . "/details",
+  );
+}
+
+/**
+ * Callback function for Epsilon Logs details page.
+ *
+ * @param object $entity
+ *   Entity object of the log.
+ */
+function epsilon_harmony_logs_details($entity) {
+  $data = array(
+    'log_id' => $entity->log_id,
+    'endpoint' => $entity->endpoint,
+    'uid' => user_load($entity->uid),
+    'status_code' => $entity->status_code,
+    'status_message' => $entity->status_message,
+    'header' => json_decode($entity->header),
+    'request' => json_decode($entity->request),
+    'response' => json_decode($entity->response),
+    'created' => $entity->created,
+  );
+  $content = theme('epsilon_harmony_log', $data);
+  return $content;
+}
+
+/**
+ * Load an object of the Epsilon Harmony Logs entity.
+ *
+ * @param int $id
+ *   Entity ID for the log to be loaded.
+ * @param bool $reset
+ *   Logical value indicating whether the cache is reset.
+ *
+ * @return object
+ *   Object $epsilon_harmony_log or FALSE if it has not been set.
+ */
+function epsilon_harmony_logs_load($id = NULL, $reset = FALSE) {
+  $ids = (isset($id) ? array($id) : array());
+  $epsilon_harmony_log = epsilon_harmony_logs_load_multiple($ids, $reset);
+  return $epsilon_harmony_log ? reset($epsilon_harmony_log) : FALSE;
+}
+
+/**
+ * Load multiple Epsilon Harmony Logs entities.
+ *
+ * Calls the load() method of the entity controller.
+ */
+function epsilon_harmony_logs_load_multiple($ids = FALSE, $conditions = array(), $reset = FALSE) {
+  return entity_load('epsilon_harmony_logs', $ids, $conditions, $reset);
+}
+
+/**
+ * Call the save() controller method.
+ */
+function epsilon_harmony_logs_create() {
+  global $user;
+  // If sid is not set then initialize it to zero.
+  $uid = (isset($uid) ? $uid : 0);
+  $arrayEpsilonHarmonyLogs = array();
+  $arrayEpsilonHarmonyLogs['uid'] = $user->uid;
+  return entity_get_controller('epsilon_harmony_logs')->create($arrayEpsilonHarmonyLogs);
+}
+
+/**
+ * Call the save() controller method.
+ */
+function epsilon_harmony_logs_save(&$entity) {
+  return entity_get_controller('epsilon_harmony_logs')->save($entity);
+}
+
+/**
+ * Callback function to log any epsilon log.
+ */
+function epsilon_harmony_log($logArr) {
+  $epsilon_harmony_log_entity = epsilon_harmony_logs_create();
+  foreach ($logArr as $key => $value) {
+    $epsilon_harmony_log_entity->$key = $value;
+  }
+  epsilon_harmony_logs_save($epsilon_harmony_log_entity);
+  return $epsilon_harmony_log_entity;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function epsilon_harmony_views_api() {
+  return array(
+    'api' => 3.0,
+    'path' => drupal_get_path('module', 'epsilon_harmony') . '/views',
+  );
+}

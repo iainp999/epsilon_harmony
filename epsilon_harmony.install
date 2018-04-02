@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * @file
+ * Install for Epsilon Harmony Module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function epsilon_harmony_schema() {
+  $schema['epsilon_harmony_logs'] = array(
+    'description' => 'Custom table for logging of epsilon API requests.',
+    'fields' => array(
+      'log_id' => array(
+        'description' => 'Primary key: Log ID for each log.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'endpoint' => array(
+        'description' => 'Endpoint of API called.',
+        'type' => 'varchar',
+        'length' => 100,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid that created this log.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status_code' => array(
+        'description' => 'Status Code received from the API Response.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'status_message' => array(
+        'description' => 'Error message in available.',
+        'type' => 'varchar',
+        'length' => 100,
+        'not null' => FALSE,
+      ),
+      'header' => array(
+        'description' => 'Header set from API.',
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => FALSE,
+      ),
+      'request' => array(
+        'description' => 'Request sent to API.',
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => FALSE,
+      ),
+      'response' => array(
+        'description' => 'Response fetched from API.',
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => FALSE,
+      ),
+      'created' => array(
+        'description' => 'The unix timestamp when the log was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+    ),
+    'indexes' => array(
+      'log_id' => array('log_id'),
+      'uid' => array('uid'),
+    ),
+    'primary key' => array('log_id'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function epsilon_harmony_uninstall() {
+  variable_del('epsilon_harmony_client_id');
+  variable_del('epsilon_harmony_secret_key');
+  variable_del('epsilon_harmony_username');
+  variable_del('epsilon_harmony_password');
+  variable_del('epsilon_harmony_xouid');
+  variable_del('epsilon_harmony_region');
+  variable_del('epsilon_harmony_message_id_array');
+
+  db_drop_table('epsilon_harmony_logs');
+}
