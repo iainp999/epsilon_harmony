@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file
+ * A client module to connect to Epsilon Harmony APIs.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function epsilon_harmony_menu() {
+  $items['admin/config/services/epsilon_harmony'] = array(
+    'title' => 'Epsilon Harmony',
+    'description' => 'Configure the Epsilon Harmony API Account and access logs.',
+    'position' => 'right',
+    'weight' => -10,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+
+  $items['admin/config/services/epsilon_harmony/configurations'] = array(
+    'title' => 'Configurations',
+    'description' => 'Configure the Epsilon Harmony API Account.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('epsilon_harmony_config_form'),
+    'access arguments' => array('administer epsilon harmony'),
+    'file' => 'includes/Form/epsilon_harmony_form.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['admin/config/services/epsilon_harmony/message_configuration'] = array(
+    'title' => 'Message Configurations',
+    'description' => 'Configure the Epsilon Harmony Message IDs.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('epsilon_harmony_message_form'),
+    'access arguments' => array('administer epsilon harmony'),
+    'file' => 'includes/Form/epsilon_harmony_form.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function epsilon_harmony_permission() {
+  return array(
+    'administer epsilon harmony' => array(
+      'title' => t('Administer Epsilon Harmony'),
+    ),
+    'access epsilon harmony logs' => array(
+      'title' => t('Access Epsilon Harmony Logs'),
+    ),
+  );
+}
