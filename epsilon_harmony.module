@@ -1,9 +1,13 @@
 <?php
 
+use Drupal\epsilon_harmony\EpsilonApiFactory;;
+
 /**
  * @file
  * A client module to connect to Epsilon Harmony APIs.
  */
+
+module_load_include('inc', 'epsilon_harmony', 'includes/Api/EpsilonApiFactory');
 
 /**
  * Implements hook_menu().
@@ -40,13 +44,21 @@ function epsilon_harmony_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
-  //Entity display page.
+  // Entity display page.
   $items['admin/config/services/epsilon_harmony/log/%epsilon_harmony_logs/details'] = array(
     'title' => 'Epsilon Harmony Log Details',
     'page callback' => 'epsilon_harmony_logs_details',
     'page arguments' => array(5),
     'access arguments' => array('access epsilon harmony logs'),
-  );    
+  );
+
+  $items['admin/config/services/epsilon_harmony/testing'] = array(
+    'title' => 'Test',
+    'page callback' => 'epsilon_harmony_test_page_callback',
+    'access callback' => TRUE,
+    'weight' => 5,
+    'type' => MENU_LOCAL_TASK,
+  );
 
   return $items;
 }
@@ -194,4 +206,12 @@ function epsilon_harmony_views_api() {
     'api' => 3.0,
     'path' => drupal_get_path('module', 'epsilon_harmony') . '/views',
   );
+}
+
+/**
+ * Callback function for the Test Page.
+ */
+function epsilon_harmony_test_page_callback() {
+  $classObj = new EpsilonApiFactory();
+  $classObj->testApi();
 }

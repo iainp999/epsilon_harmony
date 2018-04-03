@@ -1,6 +1,6 @@
 <?php
 
-namespace EpsilonHarmonyConnector;
+namespace Drupal\epsilon_harmony;
 
 use Exception as Exception;
 
@@ -71,16 +71,21 @@ class EpsilonHarmonyConnectorFactory {
    * Constructor. Should not be really used. Check the static methods.
    */
   public function __construct() {
-    $this->setClientId(variable_get('epsilon_harmony_client_id', ''));
-    $this->setsecretKey(variable_get('epsilon_harmony_secret_key', ''));
-    $this->setUsername(variable_get('epsilon_harmony_username', ''));
-    $this->setPassword(variable_get('epsilon_harmony_password', ''));
-    $this->setXouid(variable_get('epsilon_harmony_xouid', ''));
-    $this->setTokenTimeout(variable_get('epsilon_harmony_token_timeout', ''));
-    $this->setMessageArray(variable_get('epsilon_harmony_message_id_array', ''));
+    try {
+      $this->setClientId(variable_get('epsilon_harmony_client_id', ''));
+      $this->setsecretKey(variable_get('epsilon_harmony_secret_key', ''));
+      $this->setUsername(variable_get('epsilon_harmony_username', ''));
+      $this->setPassword(variable_get('epsilon_harmony_password', ''));
+      $this->setXouid(variable_get('epsilon_harmony_xouid', ''));
+      $this->setTokenTimeout(variable_get('epsilon_harmony_token_timeout', ''));
+      $this->setMessageArray(variable_get('epsilon_harmony_message_id_array', ''));
 
-    // Setting the static variable.
-    self::$accessToken = variable_get('epsilon_harmony_access_token', '');
+      // Setting the static variable.
+      self::$accessToken = variable_get('epsilon_harmony_access_token', '');      
+    } catch (Exception $e) {
+      watchdog_exception("epsilon_harmony", $e, $e->getMessage(), array(), WATCHDOG_ERROR);
+      drupal_set_message($e->getMessage(), 'error');
+    }
   }
 
   /**

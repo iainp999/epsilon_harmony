@@ -1,7 +1,6 @@
 <?php
 
-namespace EpsilonHarmonyConnector;
-
+namespace Drupal\epsilon_harmony;
 module_load_include('inc', 'epsilon_harmony', 'includes/Api/EpsilonConnectionFactory');
 
 use Exception as Exception;
@@ -19,55 +18,49 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
    * @return string
    *   Returns the access token.
    */
-  public static function getToken($object) {
-    try {
-      // @todo Check if the timeout is set to 3600
-      if ($object->getTokenTimeout() == NULL || (time() - $object->getTokenTimeout() > 3600)) {
-        $url = "https://api-public.eu.epsilon.com/Epsilon/oauth2/access_token";
+  public static function getToken($object, $test = FALSE) {
+    // @todo Check if the timeout is set to 3600
+    if ($test == TRUE || ($object->getTokenTimeout() == NULL || (time() - $object->getTokenTimeout() > 3600))) {
+      $url = "https://api-public.eu.epsilon.com/Epsilon/oauth2/access_token";
 
-        // Form data to be passed.
-        $data['username']   = $object->getUsername();
-        $data['password']   = $object->getPassword();
-        $data['scope']      = 'cn mail sn givenname uid employeeNumber';
-        $data['grant_type'] = 'password';
+      // Form data to be passed.
+      $data['username']   = $object->getUsername();
+      $data['password']   = $object->getPassword();
+      $data['scope']      = 'cn mail sn givenname uid employeeNumber';
+      $data['grant_type'] = 'password';
 
-        $options = array(
-          'method' => 'POST',
-          'headers' => array(
-            'Authorization' => 'Basic ' . $object->getBaseToken(),
-            'Content-Type' => 'application/x-www-form-urlencoded',
-          ),
-          'data' => $object->serializeData($data),
-        );
+      $options = array(
+        'method' => 'POST',
+        'headers' => array(
+          'Authorization' => 'Basic ' . $object->getBaseToken(),
+          'Content-Type' => 'application/x-www-form-urlencoded',
+        ),
+        'data' => $object->serializeData($data),
+      );
 
-        // HTTP Form request.
-        $request = drupal_http_request($url, $options);
+      // HTTP Form request.
+      $request = drupal_http_request($url, $options);
 
-        // Log the API.
-        $logArr['endpoint'] = $url;
-        $logArr['status_code'] = (isset($request->code)) ? $request->code : "";
-        $logArr['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
-        $logArr['header'] = json_encode($options['headers']);
-        $logArr['request'] = json_encode($options['data']);
-        $logArr['response'] = (isset($request->data)) ? $request->data : $request->error;
-        epsilon_harmony_log($logArr);
+      // Log the API.
+      $logArr['endpoint'] = $url;
+      $logArr['status_code'] = (isset($request->code)) ? $request->code : "";
+      $logArr['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
+      $logArr['header'] = json_encode($options['headers']);
+      $logArr['request'] = json_encode($options['data']);
+      $logArr['response'] = (isset($request->data)) ? $request->data : $request->error;
+      epsilon_harmony_log($logArr);
 
-        if ($request->code == 200) {
-          variable_set('epsilon_harmony_token_timeout', time());
-          variable_set('epsilon_harmony_access_token', json_decode($request->data)->access_token);
-          return json_decode($request->data)->access_token;
-        }
-        else {
-          throw new Exception('Something went wrong while fetching the token. Please check the logs for further details.');
-        }
+      if ($request->code == 200) {
+        variable_set('epsilon_harmony_token_timeout', time());
+        variable_set('epsilon_harmony_access_token', json_decode($request->data)->access_token);
+        return json_decode($request->data)->access_token;
       }
       else {
-        return self::$accessToken;
+        throw new Exception('Something went wrong while fetching the token. Please check the logs for further details.');
       }
     }
-    catch (Exception $e) {
-      watchdog_exception("epsilon_harmony", $e, $e->getMessage(), array(), WATCHDOG_ERROR);
-      throw $e;
+    else {
+      return self::$accessToken;
     }
   }
 
@@ -232,6 +225,24 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
       watchdog_exception("epsilon_harmony", $e, $e->getMessage(), array(), WATCHDOG_ERROR);
       drupal_set_message($e->getMessage(), 'error');
     }
+  }
+
+  /**
+   * Checks if the configurations are valid by making a token call.
+   *
+   * @return null
+   *   Returns the response recieved from the API.
+   */
+  public function testApi() {
+    try {
+      $token = self::getToken($this, TRUE);
+      drupal_set_message(t('All OK! Please check the logs for more details.'), 'status');
+    }
+    catch (Exception $e) {
+      watchdog_exception("epsilon_harmony", $e, $e->getMessage(), array(), WATCHDOG_ERROR);
+      drupal_set_message($e->getMessage(), 'error');
+    }
+    drupal_goto('/admin/config/services/epsilon_harmony/configurations');
   }
 
 }
