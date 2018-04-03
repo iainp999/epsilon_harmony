@@ -2,14 +2,10 @@
 
 /**
  * @file
+ * A client module to connect to Epsilon Harmony APIs.
  */
 
 use Drupal\epsilon_harmony\EpsilonApiFactory;
-
-/**
- * @file
- * A client module to connect to Epsilon Harmony APIs.
- */
 
 module_load_include('inc', 'epsilon_harmony', 'includes/Api/EpsilonApiFactory');
 
@@ -25,7 +21,7 @@ function epsilon_harmony_menu() {
     'page callback' => 'system_admin_menu_block_page',
     'access arguments' => array('access administration pages'),
     'file' => 'system.admin.inc',
-    'file path' => drupal_get_path('module', 'system'),
+    'file path' => drupal_get_path('module', 'system'),  
   );
 
   $items['admin/config/services/epsilon_harmony/configurations'] = array(

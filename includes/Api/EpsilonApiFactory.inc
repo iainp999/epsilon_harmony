@@ -1,7 +1,6 @@
 <?php
 
 namespace Drupal\epsilon_harmony;
-
 module_load_include('inc', 'epsilon_harmony', 'includes/Api/EpsilonConnectionFactory');
 
 use Exception as Exception;
@@ -245,5 +244,4 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
     }
     drupal_goto('/admin/config/services/epsilon_harmony/configurations');
   }
-
 }

@@ -58,7 +58,7 @@ class EpsilonHarmonyConnectorFactory {
    *
    * @var object
    */
-  private $defaultApiRegion = NULL;
+  private $defaultApiRegion = NULL;  
 
   /**
    * Access Token.
@@ -74,18 +74,7 @@ class EpsilonHarmonyConnectorFactory {
    */
   private $tokenTimeout = NULL;
 
-  /**
-   * Token Url as per the region selected.
-   *
-   * @var string
-   */
   protected $tokenUrl = NULL;
-
-  /**
-   * API Url as per the region selected.
-   *
-   * @var string
-   */
   protected $apiUrl = NULL;
 
   /**
@@ -103,9 +92,8 @@ class EpsilonHarmonyConnectorFactory {
       $this->setMessageArray(variable_get('epsilon_harmony_message_id_array', ''));
       $this->setApiBaseUrl();
       // Setting the static variable.
-      self::$accessToken = variable_get('epsilon_harmony_access_token', '');
-    }
-    catch (Exception $e) {
+      self::$accessToken = variable_get('epsilon_harmony_access_token', '');      
+    } catch (Exception $e) {
       watchdog_exception("epsilon_harmony", $e, $e->getMessage(), array(), WATCHDOG_ERROR);
       drupal_set_message($e->getMessage(), 'error');
     }
@@ -327,7 +315,7 @@ class EpsilonHarmonyConnectorFactory {
    * Create the base URL for the selected region.
    */
   protected function setApiBaseUrl() {
-    if ($this->defaultApiRegion == "eu") {
+    if($this->defaultApiRegion == "eu") {
       $this->tokenUrl = "https://api-public.eu.epsilon.com";
       $this->apiUrl = "https://api.harmony.eu.epsilon.com";
     }
@@ -335,7 +323,7 @@ class EpsilonHarmonyConnectorFactory {
       $this->tokenUrl = "https://api-public.epsilon.com";
       $this->apiUrl = "https://api.harmony.epsilon.com";
     }
-  }
+  }  
 
   /**
    * Concatenate the client id and secret key.
@@ -369,5 +357,4 @@ class EpsilonHarmonyConnectorFactory {
     }
     return $string;
   }
-
 }
