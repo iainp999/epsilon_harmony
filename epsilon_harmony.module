@@ -1,6 +1,10 @@
 <?php
 
-use Drupal\epsilon_harmony\EpsilonApiFactory;;
+/**
+ * @file
+ */
+
+use Drupal\epsilon_harmony\EpsilonApiFactory;
 
 /**
  * @file
@@ -44,20 +48,20 @@ function epsilon_harmony_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $items['admin/config/services/epsilon_harmony/testing'] = array(
+    'title' => 'Test',
+    'page callback' => 'epsilon_harmony_test_page_callback',
+    'access arguments' => array('administer epsilon harmony'),
+    'weight' => 5,
+    'type' => MENU_LOCAL_TASK,
+  );
+
   // Entity display page.
   $items['admin/config/services/epsilon_harmony/log/%epsilon_harmony_logs/details'] = array(
     'title' => 'Epsilon Harmony Log Details',
     'page callback' => 'epsilon_harmony_logs_details',
     'page arguments' => array(5),
     'access arguments' => array('access epsilon harmony logs'),
-  );
-
-  $items['admin/config/services/epsilon_harmony/testing'] = array(
-    'title' => 'Test',
-    'page callback' => 'epsilon_harmony_test_page_callback',
-    'access callback' => TRUE,
-    'weight' => 5,
-    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;

@@ -5,7 +5,7 @@
  * This file contains the admin section configurations form.
  */
 
-module_load_include('inc', 'epsilon_harmony', 'includes//Api/EpsilonApiFactory');
+module_load_include('inc', 'epsilon_harmony', 'includes/Api/EpsilonApiFactory');
 
 /**
  * Implements hook_form().

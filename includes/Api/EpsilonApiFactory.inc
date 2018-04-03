@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\epsilon_harmony;
+
 module_load_include('inc', 'epsilon_harmony', 'includes/Api/EpsilonConnectionFactory');
 
 use Exception as Exception;
@@ -21,7 +22,7 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
   public static function getToken($object, $test = FALSE) {
     // @todo Check if the timeout is set to 3600
     if ($test == TRUE || ($object->getTokenTimeout() == NULL || (time() - $object->getTokenTimeout() > 3600))) {
-      $url = "https://api-public.eu.epsilon.com/Epsilon/oauth2/access_token";
+      $url = $object->tokenUrl . "/Epsilon/oauth2/access_token";
 
       // Form data to be passed.
       $data['username']   = $object->getUsername();
@@ -75,7 +76,7 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
    */
   public function createRecord($record) {
     try {
-      $url = "https://api.harmony.eu.epsilon.com/v4/profiles/records";
+      $url = $this->apiUrl . "/v4/profiles/records";
       $record = json_encode($record);
       $options = array(
         'method' => 'POST',
@@ -128,7 +129,7 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
    */
   public function updateRecord($record) {
     try {
-      $url = "https://api.harmony.eu.epsilon.com/v4/profiles/records/" . $record['CustomerKey'];
+      $url = $this->apiUrl . "/v4/profiles/records/" . $record['CustomerKey'];
       $options = array(
         'method' => 'PUT',
         'headers' => array(
@@ -186,7 +187,7 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
         throw new Exception('Message ID not available.');
       }
 
-      $url = "https://api.harmony.eu.epsilon.com/v3/messages/" . $this->getmessageId($message_id) . "/send";
+      $url = $this->apiUrl . "/v3/messages/" . $this->getmessageId($message_id) . "/send";
       $options = array(
         'method' => 'PUT',
         'headers' => array(

@@ -54,6 +54,13 @@ class EpsilonHarmonyConnectorFactory {
   private $messageIdObject = NULL;
 
   /**
+   * Default API Region.
+   *
+   * @var object
+   */
+  private $defaultApiRegion = NULL;
+
+  /**
    * Access Token.
    *
    * @var string
@@ -68,6 +75,20 @@ class EpsilonHarmonyConnectorFactory {
   private $tokenTimeout = NULL;
 
   /**
+   * Token Url as per the region selected.
+   *
+   * @var string
+   */
+  protected $tokenUrl = NULL;
+
+  /**
+   * API Url as per the region selected.
+   *
+   * @var string
+   */
+  protected $apiUrl = NULL;
+
+  /**
    * Constructor. Should not be really used. Check the static methods.
    */
   public function __construct() {
@@ -77,12 +98,14 @@ class EpsilonHarmonyConnectorFactory {
       $this->setUsername(variable_get('epsilon_harmony_username', ''));
       $this->setPassword(variable_get('epsilon_harmony_password', ''));
       $this->setXouid(variable_get('epsilon_harmony_xouid', ''));
+      $this->setApiRegion(variable_get('epsilon_harmony_region', ''));
       $this->setTokenTimeout(variable_get('epsilon_harmony_token_timeout', ''));
       $this->setMessageArray(variable_get('epsilon_harmony_message_id_array', ''));
-
+      $this->setApiBaseUrl();
       // Setting the static variable.
-      self::$accessToken = variable_get('epsilon_harmony_access_token', '');      
-    } catch (Exception $e) {
+      self::$accessToken = variable_get('epsilon_harmony_access_token', '');
+    }
+    catch (Exception $e) {
       watchdog_exception("epsilon_harmony", $e, $e->getMessage(), array(), WATCHDOG_ERROR);
       drupal_set_message($e->getMessage(), 'error');
     }
@@ -278,6 +301,40 @@ class EpsilonHarmonyConnectorFactory {
       throw new Exception('Please enter a correct message identifier.');
     }
     return $message_ids->$key;
+  }
+
+  /**
+   * Set the API region.
+   *
+   * @param string $region
+   *   Region selected by the user on the configuration form.
+   */
+  protected function setApiRegion($region) {
+    $this->defaultApiRegion = $region;
+  }
+
+  /**
+   * Get the API region.
+   *
+   * @return string
+   *   Returns the default region ID.
+   */
+  protected function getApiRegion() {
+    return $this->defaultApiRegion;
+  }
+
+  /**
+   * Create the base URL for the selected region.
+   */
+  protected function setApiBaseUrl() {
+    if ($this->defaultApiRegion == "eu") {
+      $this->tokenUrl = "https://api-public.eu.epsilon.com";
+      $this->apiUrl = "https://api.harmony.eu.epsilon.com";
+    }
+    else {
+      $this->tokenUrl = "https://api-public.epsilon.com";
+      $this->apiUrl = "https://api.harmony.epsilon.com";
+    }
   }
 
   /**
