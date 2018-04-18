@@ -18,42 +18,42 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
    * @return string
    *   Returns the access token.
    */
-  public static function getToken($object, $test = FALSE) {
-    // @todo Check if the timeout is set to 3600
-    if ($test == TRUE || ($object->getTokenTimeout() == NULL || (time() - $object->getTokenTimeout() > 3600))) {
-      $url = $object->tokenUrl . "/Epsilon/oauth2/access_token";
+  public static function getToken($credentials, $test = FALSE) {
+    if ($test == TRUE || ($credentials->getTokenTimeout() == NULL || (time() - $credentials->getTokenTimeout() > 3600))) {
+      $url = $credentials->tokenUrl . "/Epsilon/oauth2/access_token";
 
       // Form data to be passed.
-      $data['username']   = $object->getUsername();
-      $data['password']   = $object->getPassword();
+      $data['username']   = $credentials->getUsername();
+      $data['password']   = $credentials->getPassword();
       $data['scope']      = 'cn mail sn givenname uid employeeNumber';
       $data['grant_type'] = 'password';
 
       $options = array(
         'method' => 'POST',
         'headers' => array(
-          'Authorization' => 'Basic ' . $object->getBaseToken(),
+          'Authorization' => 'Basic ' . $credentials->getBaseToken(),
           'Content-Type' => 'application/x-www-form-urlencoded',
         ),
-        'data' => $object->serializeData($data),
+        'data' => http_build_query($data),
       );
 
       // HTTP Form request.
       $request = drupal_http_request($url, $options);
 
       // Log the API.
-      $logArr['endpoint'] = $url;
-      $logArr['status_code'] = (isset($request->code)) ? $request->code : "";
-      $logArr['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
-      $logArr['header'] = json_encode($options['headers']);
-      $logArr['request'] = json_encode($options['data']);
-      $logArr['response'] = (isset($request->data)) ? $request->data : $request->error;
-      epsilon_harmony_log($logArr);
+      $log_data['endpoint'] = $url;
+      $log_data['status_code'] = (isset($request->code)) ? $request->code : "";
+      $log_data['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
+      $log_data['header'] = json_encode($options['headers']);
+      $log_data['request'] = json_encode($options['data']);
+      $log_data['response'] = (isset($request->data)) ? $request->data : $request->error;
+      epsilon_harmony_log($log_data);
 
       if ($request->code == 200) {
+        $access_token = json_decode($request->data)->access_token;
         variable_set('epsilon_harmony_token_timeout', time());
-        variable_set('epsilon_harmony_access_token', json_decode($request->data)->access_token);
-        return json_decode($request->data)->access_token;
+        variable_set('epsilon_harmony_access_token', $access_token);
+        return $access_token;
       }
       else {
         throw new Exception('Something went wrong while fetching the token. Please check the logs for further details.');
@@ -91,13 +91,13 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
       $request = drupal_http_request($url, $options);
 
       // Log the API.
-      $logArr['endpoint'] = $url;
-      $logArr['header'] = json_encode($options['headers']);
-      $logArr['request'] = json_encode($options['data']);
-      $logArr['status_code'] = (isset($request->code)) ? $request->code : "";
-      $logArr['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
-      $logArr['response'] = (isset($request->data)) ? $request->data : $request->error;
-      epsilon_harmony_log($logArr);
+      $log_data['endpoint'] = $url;
+      $log_data['header'] = json_encode($options['headers']);
+      $log_data['request'] = json_encode($options['data']);
+      $log_data['status_code'] = (isset($request->code)) ? $request->code : "";
+      $log_data['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
+      $log_data['response'] = (isset($request->data)) ? $request->data : $request->error;
+      epsilon_harmony_log($log_data);
 
       if ($request->code == 200) {
         drupal_set_message(t('Record successfully created. Please check the epsilon logs for further details.'), 'status');
@@ -143,13 +143,13 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
       $request = drupal_http_request($url, $options);
 
       // Log the API.
-      $logArr['endpoint'] = $url;
-      $logArr['status_code'] = (isset($request->code)) ? $request->code : "";
-      $logArr['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
-      $logArr['header'] = json_encode($options['headers']);
-      $logArr['request'] = json_encode($options['data']);
-      $logArr['response'] = (isset($request->data)) ? $request->data : $request->error;
-      epsilon_harmony_log($logArr);
+      $log_data['endpoint'] = $url;
+      $log_data['status_code'] = (isset($request->code)) ? $request->code : "";
+      $log_data['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
+      $log_data['header'] = json_encode($options['headers']);
+      $log_data['request'] = json_encode($options['data']);
+      $log_data['response'] = (isset($request->data)) ? $request->data : $request->error;
+      epsilon_harmony_log($log_data);
 
       if ($request->code == 200) {
         drupal_set_message(t('Record successfully updated. Please check the epsilon logs for further details.'), 'status');
@@ -201,13 +201,13 @@ class EpsilonApiFactory extends EpsilonHarmonyConnectorFactory {
       $request = drupal_http_request($url, $options);
 
       // Log the API.
-      $logArr['endpoint'] = $url;
-      $logArr['status_code'] = (isset($request->code)) ? $request->code : "";
-      $logArr['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
-      $logArr['header'] = json_encode($options['headers']);
-      $logArr['request'] = json_encode($options['data']);
-      $logArr['response'] = (isset($request->data)) ? $request->data : $request->error;
-      epsilon_harmony_log($logArr);
+      $log_data['endpoint'] = $url;
+      $log_data['status_code'] = (isset($request->code)) ? $request->code : "";
+      $log_data['status_message'] = (isset($request->status_message)) ? $request->status_message : "";
+      $log_data['header'] = json_encode($options['headers']);
+      $log_data['request'] = json_encode($options['data']);
+      $log_data['response'] = (isset($request->data)) ? $request->data : $request->error;
+      epsilon_harmony_log($log_data);
 
       if ($request->code == 200) {
         drupal_set_message(t('Message successfully sent. Please check the epsilon logs for further details.'), 'status');
