@@ -70,7 +70,6 @@ function epsilon_harmony_config_form($form, &$form_state) {
  * Implements hook_form().
  */
 function epsilon_harmony_message_form($form, &$form_state) {
-  // variable_del('epsilon_harmony_message_id_array');.
   $form['#tree'] = TRUE;
   $initial_number = 0;
 
@@ -157,7 +156,7 @@ function epsilon_harmony_message_form($form, &$form_state) {
 }
 
 /**
- * Add a option to create a new message ID.
+ * Add an option to create a new message ID.
  */
 function epsilon_harmony_message_form_add_item($form, &$form_state) {
   // All we need is to increase the number used in our for loop above ...
@@ -173,14 +172,18 @@ function epsilon_harmony_message_form_submit($form, &$form_state) {
   foreach ($form_state['values']['container'] as $key => $value) {
     $message_id_array[$value['name']] = $value['message_id'];
   }
-  variable_set('epsilon_harmony_message_id_array', json_encode($message_id_array));
+  if(!empty($message_id_array)) {
+    variable_set('epsilon_harmony_message_id_array', json_encode($message_id_array));
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**
  * Delete the last unsaved message ID.
  */
 function epsilon_harmony_message_form_remove_item($form, &$form_state) {
-  // Just the other way around until only one item is left ...
+  // Remove the last unsaved message ID.
   if ($form_state['number_names'] > 1) {
     $form_state['number_names']--;
   }
