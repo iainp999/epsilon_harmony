@@ -334,27 +334,4 @@ class EpsilonHarmonyConnectorFactory {
   protected function getBaseToken() {
     return base64_encode($this->clientId . ":" . $this->secretKey);
   }
-
-  /**
-   * Process the form data to create a string to pass to API.
-   * This method is to process the form data when content-type is
-   * set to "application/x-www-form-urlencoded".
-   *
-   * @return string
-   *   Returns stringified value of the form data.
-   */
-  protected function serializeData($data) {
-    $i = 0;
-    $string = "";
-    foreach ($data as $key => $value) {
-      if ($i == 0) {
-        $string .= $key . "=" . $value;
-      }
-      else {
-        $string .= "&" . $key . "=" . $value;
-      }
-      $i++;
-    }
-    return $string;
-  }
 }
